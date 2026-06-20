@@ -48,8 +48,11 @@ def get_price_change(ticker: str) -> tuple[float | None, float | None, float | N
             print(f"  {ticker}: not enough data ({len(df)} bars), skipping.")
             return None, None, None
 
-        current = float(df["Close"].iloc[-1])
-        past    = float(df["Close"].iloc[-LOOKBACK_HOURS])
+        # .squeeze() handles newer yfinance versions that return a DataFrame
+        # instead of a Series for single-ticker downloads.
+        close   = df["Close"].squeeze()
+        current = float(close.iloc[-1])
+        past    = float(close.iloc[-LOOKBACK_HOURS])
         pct     = (current - past) / past * 100
 
         return current, past, pct
